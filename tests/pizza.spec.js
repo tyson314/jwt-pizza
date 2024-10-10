@@ -231,6 +231,19 @@ test('not found', async ({ page }) => {
 });
 
 test('register', async ({ page }) => {
+  await page.route('*/**/api/auth', async (route) => {
+    const registerReq = {
+      name: 'Tyosn',
+      email: 'tyson@tysonty',
+      password: 'tyson'
+    }
+    const registerRes = { user: { id: 3, name: 'Tyson', email: 'tyson@tysonty', roles: [{ role: 'diner' }] }, token: 'abcdef' };
+
+    expect(route.request().method()).toBe('POST');
+    expect(route.request().postDataJSON()).toMatchObject(registerReq);
+    await route.fulfill({ json: registerRes });
+  });
+
   await page.goto('/');
   await page.getByRole('link', { name: 'Register' }).click();
   await expect(page.getByText('Welcome to the party')).toBeVisible();
@@ -244,8 +257,6 @@ test('register', async ({ page }) => {
   await page.getByPlaceholder('Full name').click();
   await page.getByPlaceholder('Full name').fill('Tyosn');
   await page.getByPlaceholder('Full name').press('Tab');
-  await page.getByPlaceholder('Email address').fill('tyson');
-  await page.getByPlaceholder('Email address').click();
   await page.getByPlaceholder('Email address').fill('tyson@tysonty');
   await page.getByPlaceholder('Password').click();
   await page.getByPlaceholder('Password').fill('tyson');
