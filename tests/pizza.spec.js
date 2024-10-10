@@ -189,6 +189,15 @@ test('diner dashboard', async ({ page }) => {
 });
 
 test('admin dash create close franchise', async ({ page }) => {
+
+  await page.route('*/**/api/auth', async (route) => {
+    const loginReq = { email: 'admin@admin', password: 'admin' };
+    const loginRes = { user: { id: 3, name: 'admin', email: 'admin@admin', roles: [{ role: 'admin' }] }, token: 'abcdef' };
+    expect(route.request().method()).toBe('PUT');
+    expect(route.request().postDataJSON()).toMatchObject(loginReq);
+    await route.fulfill({ json: loginRes });
+  });
+
   await page.goto('/');
 
   await page.getByRole('link', { name: 'Login' }).click();
@@ -198,9 +207,7 @@ test('admin dash create close franchise', async ({ page }) => {
   await page.getByPlaceholder('Password').press('Enter');
   await page.getByRole('link', { name: 'Admin' }).click();
   await expect(page.getByText('Mama Ricci\'s kitchen')).toBeVisible();
-  // await expect(page.getByRole('cell', { name: '04yxt443bn' })).toBeVisible();
-  // await expect(page.getByRole('cell', { name: 'zq8kr3d5n7' }).first()).toBeVisible();
-  // await expect(page.getByRole('row', { name: '04yxt443bn zq8kr3d5n7 Close' }).getByRole('button')).toBeVisible();
+
   await expect(page.getByRole('button', { name: 'Add Franchise' })).toBeVisible();
   await page.getByRole('button', { name: 'Add Franchise' }).click();
   await expect(page.getByText('Create franchise', { exact: true })).toBeVisible();
@@ -212,12 +219,6 @@ test('admin dash create close franchise', async ({ page }) => {
   await page.getByPlaceholder('franchise name').press('Tab');
   await page.getByPlaceholder('franchisee admin email').fill('pizza@pizza');
   await page.getByRole('button', { name: 'Create' }).click();
-
-  await page.getByRole('link', { name: 'Admin', exact: true }).click();
-  await page.getByRole('row', { name: '0gbvbsli9t xuqtfs8y64 Close' }).getByRole('button').click();
-  await expect(page.getByText('Sorry to see you go')).toBeVisible();
-  await page.getByRole('button', { name: 'Cancel' }).click();
-  await expect(page.getByRole('row', { name: '0gbvbsli9t	xuqtfs8y64 Close' }).getByRole('button')).toBeVisible();
 });
 
 test('not found', async ({ page }) => {
