@@ -74,7 +74,7 @@ jobs:
       - name: Download dist artifact
         uses: actions/download-artifact@v4
         with:
-          name: package
+          name: package 
           path: dist/
 
       - name: Push to AWS S3
